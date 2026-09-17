@@ -61,8 +61,8 @@ namespace Planning
 
     // 赋值
     // 速度更新
-        const double speed_x = 1.0 * std::cos(trajectory->local_trajectory[closest_index].path_point.theta);
-        const double speed_y = 1.0 * std::sin(trajectory->local_trajectory[closest_index].path_point.theta);
+        const double speed_x = trajectory->local_trajectory[closest_index].speed_point.speed * std::cos(trajectory->local_trajectory[closest_index].path_point.theta);
+        const double speed_y = trajectory->local_trajectory[closest_index].speed_point.speed * std::sin(trajectory->local_trajectory[closest_index].path_point.theta);
 
     // 位置更新
 #ifdef USE_ACTUAL_POS    

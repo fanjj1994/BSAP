@@ -44,7 +44,7 @@ namespace Planning
     // 找匹配点下标
     static int find_match_point(const Path &path, const int &last_match_point_index,
                                 const PoseStamped &target_point);                              // 利用上一帧
-    static int find_match_point(const Referline &refer_line, const PoseStamped &target_point); // 在参考线上查找匹配点
+    static int find_match_point(const Referline &path, const PoseStamped &target_point); // 在参考线上查找匹配点
     static int find_match_point(const LocalPath &path, const PoseStamped &target_point); // 在路径上查找匹配点下标
     static int find_match_point(const Referline &path, const double &rs);                // 通过rs找匹配点下标
     // 找到投影点

@@ -1,5 +1,5 @@
-#ifndef VEHICLE_BASE_H_
-#define VEHICLE_BASE_H_
+#ifndef VEHICLE_INFO_BASE_H_
+#define VEHICLE_INFO_BASE_H_
 
 #include "rclcpp/rclcpp.hpp"
 #include "base_msgs/msg/referline.hpp"
@@ -35,7 +35,7 @@ namespace Planning
       dacceleration_ = point.speed_point.dacceleration;
     }
 
-    inline void update_t0(const double t0) { t0_ -= 1.0; }
+    inline void update_t0() { t0_ -= 1.0; }
     inline void update_t_in_out(const double &t, const double &t_in, const double &t_out)
     {
       t_ = t;
@@ -137,4 +137,4 @@ namespace Planning
     double t_out_ = 0.0;
   };
 } // namespace Planning
-#endif // VEHICLE_BASE_H_
+#endif // VEHICLE_INFO_BASE_H_

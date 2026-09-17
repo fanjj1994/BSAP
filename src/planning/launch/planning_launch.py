@@ -63,7 +63,12 @@ def generate_launch_description():
     rviz2 = Node(
         package="rviz2",
         executable="rviz2",
-        arguments=["-d", rviz_conf_path],
+        arguments=["--fullscreen", "-d", rviz_conf_path],
+        additional_env={
+            "QT_QPA_PLATFORM": "xcb",
+            "GALLIUM_DRIVER": "d3d12",
+            "MESA_D3D12_DEFAULT_ADAPTER_NAME": "NVIDIA",
+        },
     )
 
     # #启动绘图节点

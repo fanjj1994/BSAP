@@ -1,7 +1,7 @@
 #ifndef OBS_CAR_INFO_H_
 #define OBS_CAR_INFO_H_
 
-#include "vehicle_base.h"
+#include "vehicle_info_base.h"
 
 namespace Planning
 {

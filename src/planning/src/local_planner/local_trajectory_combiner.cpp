@@ -19,8 +19,7 @@ namespace Planning
     local_trajectory_.header = path.header;
     local_trajectory_.local_trajectory.clear();
 
-    // if(path_size < 3 || speeds_size < 3)
-    if(path_size < 3)
+    if(path_size < 3 || speeds_size < 3)
     {
       RCLCPP_WARN(rclcpp::get_logger("trajectory"),"local path or speeds empty!");
       return local_trajectory_;
@@ -33,6 +32,10 @@ namespace Planning
       point_tmp.path_point = path.local_path[i];
 
       //速度部分的赋值
+      if ( i < speeds_size) // 因为路径长度是随速度动态变化的，所以可以直接用速度规划的小标赋值
+      {
+        point_tmp.speed_point = speeds.local_speeds[i];
+      }
 
       //填充进轨迹
       local_trajectory_.local_trajectory.emplace_back(point_tmp);

@@ -45,7 +45,7 @@ namespace Planning
       transform_data.transform.translation.x = obs_param.pos_x_;
       transform_data.transform.translation.y = obs_param.pos_y_;
       const double speed_x = obs_param.speed_ * std::cos(obs_param.theta_);
-      const double speed_y = obs_param.speed_ * std::sin(obs_param.speed_);
+      const double speed_y = obs_param.speed_ * std::sin(obs_param.theta_);
       obs_param.pos_x_ += speed_x;
       obs_param.pos_y_ += speed_y;
 
