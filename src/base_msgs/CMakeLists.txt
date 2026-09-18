@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.28)
 project(base_msgs)
 
+if(NOT CMAKE_BUILD_TYPE)
+set(CMAKE_BUILD_TYPE Release)
+endif()
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -DNDEBUG")
 # 设置C和C++标准
 if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)

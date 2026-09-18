@@ -8,6 +8,20 @@
 
 namespace Planning
 {
+  enum class ScenarioType  // 场景类型
+  {
+    LANE_FOLLOW, //循迹
+    STATIC_OBS,  // 静态绕障
+    ONLANE_OBS,  // 同一车道上的障碍物交互，包括停障，跟车，超车，会车
+    DYNAMIC_OBS  // 动态避障
+  };
+
+  struct ScenarioStruct // 场景
+  {
+    int type_ = 0;  // 场景类型
+    int obs_num_ = 0; // 障碍物数量
+  };
+
   struct VehicleStruct // 车辆
   {
     int id_ = 0;              // 序号
@@ -69,6 +83,9 @@ namespace Planning
   public:
     ConfigReader(); //配置文件读取器
 
+    // scenario
+    void read_scenario_config();
+    inline ScenarioStruct scenario() const {return scenario_;}
 
     //vehicle
     void read_vehicle_config(VehicleStruct &vehicle, const std::string &name);
@@ -112,7 +129,11 @@ namespace Planning
     void read_move_cmd_config();
 
   private:
+    YAML::Node scenario_config;
     YAML::Node planning_config;
+
+    //scenario
+    ScenarioStruct scenario_;
 
     //vehicle
     VehicleStruct main_car_;

@@ -14,6 +14,11 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+if(NOT CMAKE_BUILD_TYPE)
+set(CMAKE_BUILD_TYPE Release)
+endif()
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -DNDEBUG")
+
 # 设置预编译指令, 生成compile_commands.json
 # 然后让c_cpp_properties.json读取这个文件, 防止预编译找不到cmake中定义的宏而报错
 # c_cpp_properties.json中加上"compileCommands": "${workspaceFolder}/build/compile_commands.json"来读取这个文件

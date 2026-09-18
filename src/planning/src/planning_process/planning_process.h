@@ -6,6 +6,8 @@
 #include "base_msgs/srv/global_path_service.hpp"
 #include "base_msgs/srv/pnc_map_service.hpp"
 #include "base_msgs/msg/local_trajectory_point.hpp"
+#include "base_msgs/msg/obs_info.hpp"
+#include "base_msgs/msg/plot_info.hpp"
 #include "nav_msgs/msg/path.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "tf2_ros/static_transform_broadcaster.h"
@@ -31,6 +33,8 @@ namespace Planning
 {
   using namespace std::chrono_literals;
   using base_msgs::msg::LocalTrajectory;
+  using base_msgs::msg::ObsInfo;
+  using base_msgs::msg::PlotInfo;
   using base_msgs::msg::PNCMap;
   using base_msgs::srv::GlobalPathService;
   using base_msgs::srv::PNCMapService;
@@ -88,6 +92,8 @@ namespace Planning
 
     std::shared_ptr<LocalTrajectoryCombiner> local_trajectory_combiner_; //轨迹合成器
     rclcpp::Publisher<LocalTrajectory>::SharedPtr local_trajectory_pub_; //轨迹发布器
+
+    rclcpp::Publisher<PlotInfo>::SharedPtr plot_info_pub_;  //绘图信息发布器
 
     rclcpp::TimerBase::SharedPtr timer_; // 定时器
   };

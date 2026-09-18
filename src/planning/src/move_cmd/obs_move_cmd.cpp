@@ -11,7 +11,7 @@ namespace Planning
     obs_move_cmd_config_->read_move_cmd_config();
 
     // 初始化
-    for(int i = 0; i < 3; i++)
+    for(int i = 0; i < obs_move_cmd_config_->scenario().obs_num_; i++)
     {
       ObsParam obs_param;
       obs_param.obs_ = std::make_shared<ObsCar>(i+1);

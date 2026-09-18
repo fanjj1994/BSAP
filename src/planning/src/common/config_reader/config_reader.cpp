@@ -7,10 +7,42 @@ namespace Planning
   {
     // 获取/workspace/install/planning/share/planning/目录路径
     std::string planning_share_directory = ament_index_cpp ::get_package_share_directory("planning");
+    scenario_config = YAML::LoadFile(planning_share_directory+"/config/senario_config.yaml");
+    
+    // 确定场景类型
+    read_scenario_config();
+    switch (scenario_.type_)
+    {
+    case static_cast<int>(ScenarioType::LANE_FOLLOW):
+        planning_config = YAML::LoadFile(planning_share_directory + "/config/planning_static_obs_config.yaml");
+        break;
+    case static_cast<int>(ScenarioType::STATIC_OBS):
+        planning_config = YAML::LoadFile(planning_share_directory + "/config/planning_static_obs_config.yaml");
+        break;
+    case static_cast<int>(ScenarioType::ONLANE_OBS):
+        planning_config = YAML::LoadFile(planning_share_directory + "/config/planning_onlane_obs_config.yaml");
+        break;
+    case static_cast<int>(ScenarioType::DYNAMIC_OBS):
+        planning_config = YAML::LoadFile(planning_share_directory + "/config/planning_dynamic_obs_config.yaml");
+        break;        
+    default:
+        RCLCPP_ERROR(rclcpp::get_logger("config"),"Wrong scenario type");
+        break;
+    }
+  }
 
-    // 然后获取配置文件
-    //planning_config = YAML::LoadFile(planning_share_directory + "/config/planning_static_obs_config.yaml");
-    planning_config = YAML::LoadFile(planning_share_directory + "/config/planning_dynamic_obs_config.yaml");
+  /**************scenario******************/
+  void ConfigReader::read_scenario_config()
+  {
+    try
+    {
+      scenario_.type_ = scenario_config["scenario"]["type"].as<int>();
+      scenario_.obs_num_ = scenario_config["scenario"]["obs_num"].as<int>();
+    }
+    catch(const YAML::Exception &e)
+    {
+      RCLCPP_ERROR(rclcpp::get_logger("config"),"Failed to load scenario config");
+    }
   }
 
   /************ vehicle ************/

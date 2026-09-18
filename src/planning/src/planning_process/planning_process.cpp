@@ -13,7 +13,7 @@ namespace Planning
 
     // 创建车辆和障碍物
     car_ = std::make_shared<MainCar>();
-    for(int i = 0; i < 3 ; i++)
+    for(int i = 0; i < process_config_->scenario().obs_num_ ; i++)
     {
       auto obs_car_ = std::make_shared<ObsCar>(i+1);
       obses_spawn_.emplace_back(obs_car_);
@@ -45,12 +45,15 @@ namespace Planning
     // 创建轨迹合成器和发布器
     local_trajectory_combiner_ = std::make_shared<LocalTrajectoryCombiner> ();
     local_trajectory_pub_ = this->create_publisher<LocalTrajectory>("local_trajectory",10);
+  
+    // 创建轨迹信息发布器
+    plot_info_pub_ = this->create_publisher<PlotInfo>("plot_info",10);
   }
 
   bool PlanningProcess::process() // 总流程
   {
     // 阻塞1s，等待rviz和xacro模型先启动
-    rclcpp::Rate rate(1); 
+    rclcpp::Rate rate(0.5); 
     rate.sleep();
 
     // 初始化
@@ -316,7 +319,27 @@ namespace Planning
     local_trajectory_pub_->publish(local_trajectory);
 
     // 更新绘图信息
+    PlotInfo plot_info;
+    plot_info.header.stamp = this->now();
+    plot_info.header.frame_id = process_config_->pnc_map().frame_;
+    plot_info.trajectory_info = local_trajectory;
 
+    ObsInfo obs_info;
+    for (const auto &obs : obses_)
+    {
+      obs_info.obs_length = obs->length();
+      obs_info.obs_width = obs->width();
+      obs_info.l = obs->l();
+      obs_info.s = obs->s();
+      obs_info.s_2path = obs->s_2path();
+      obs_info.t_in = obs->t_in();
+      obs_info.t_out = obs->t_out();
+      plot_info.obs_info.emplace_back(obs_info);
+
+    }
+
+    plot_info_pub_->publish(plot_info);
+    
     // 更新车辆信息
     car_->updata_cartesian_info(local_trajectory.local_trajectory[0]);
     RCLCPP_INFO(this->get_logger(), "-----------car state : loc:(%.2f,%.2f),speed:%.2f,a:%.2f,theta:%.2f,kappa:%.2f",
