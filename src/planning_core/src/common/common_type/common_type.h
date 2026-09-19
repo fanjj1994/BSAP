@@ -2,6 +2,7 @@
 #define COMMON_TYPE_H
 
 #include <cstdint>
+#include <string>
 
 typedef uint8_t uint8;
 typedef uint16_t uint16;
@@ -14,13 +15,6 @@ typedef int32_t int32;
 
 typedef float float32;
 typedef double float64;
-#ifdef __cplusplus
-typedef long double float128;
-#endif
-
-typedef char char8;
-
-typedef bool boolean;
 
 typedef std::string std_string;
 

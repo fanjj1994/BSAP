@@ -13,13 +13,17 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='fanjj1994',
-    maintainer_email='fanjj1994@todo.todo',
+    maintainer='msi',
+    maintainer_email='2013841882@qq.com',
     description='TODO: Package description',
-    license='TODO: License declaration',
+    license='Apache-2.0',
+    extras_require={
+        'test': [
+            'pytest',
+        ],
+    },
     entry_points={
         'console_scripts': [
-            'data_plot = data_plot.data_plot:main'
         ],
     },
 )
