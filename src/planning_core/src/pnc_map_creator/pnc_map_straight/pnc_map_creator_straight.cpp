@@ -2,7 +2,7 @@
 
 namespace Planning
 {
-  PncMapCreatorStraight::PncMapCreatorStraight()
+  PNCMapCreatorStraight::PNCMapCreatorStraight()
   {
     RCLCPP_INFO(rclcpp::get_logger("pnc_map"), "PNCMapCreatorStraight is running");
 
@@ -20,7 +20,7 @@ namespace Planning
   }
 
   // 创建直道地图
-  base_msgs::msg::PNCMap PncMapCreatorStraight::createPNCMap()
+  base_msgs::msg::PNCMap PNCMapCreatorStraight::createPNCMap()
   {
     drawStraightX(pncMap.road_length,1.0);
     if(pncMap.midline.points.size()%2 == 1)
@@ -37,7 +37,7 @@ namespace Planning
   }
 
   // 初始化地图
-  void PncMapCreatorStraight::initPNCMap()
+  void PNCMapCreatorStraight::initPNCMap()
   {
     pncMap.header.frame_id = "world";
     pncMap.header.stamp = rclcpp::Clock().now();
@@ -86,7 +86,7 @@ namespace Planning
   }
 
   // 沿x轴绘制直线
-  void PncMapCreatorStraight::drawStraightX(const float64 &length, const float64 &plusFlag, const float64 &ratio)
+  void PNCMapCreatorStraight::drawStraightX(const float64 &length, const float64 &plusFlag, const float64 &ratio)
   {
     float64 lenRuler = 0.0;
     while ( lenRuler < length)

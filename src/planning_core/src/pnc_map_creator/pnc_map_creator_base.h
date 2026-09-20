@@ -11,27 +11,32 @@
 
 namespace Planning
 {
-    enum class PNCMapType : uint8// 地图类型
-    {
-        STRAIGHT = 0U,
-        STURN = 1U,
-        DEFAULT = 255U
-    };
-    class PNCMapCreatorBase // 地图创建器基类
-    {
-    public:
-        PNCMapCreatorBase() = default;
-        PNCMapCreatorBase(const PNCMapCreatorBase &) = delete;
-        virtual ~PNCMapCreatorBase() = default;
-        virtual base_msgs::msg::PNCMap createPNCMap() = 0;
+  enum class PNCMapType : uint8 // 地图类型
+  {
+    STRAIGHT = 0U,
+    STURN = 1U,
+    DEFAULT = 255U
+  };
+  class PNCMapCreatorBase // 地图创建器基类
+  {
+  public:
+    PNCMapCreatorBase() = default;
+    PNCMapCreatorBase(const PNCMapCreatorBase &) = delete;
+    virtual ~PNCMapCreatorBase() = default;
+    virtual base_msgs::msg::PNCMap createPNCMap() = 0;
+    // 获取已生成的地图本体
+    base_msgs::msg::PNCMap getPNCMap() const { return pncMap; }
 
-    protected:
-        base_msgs::msg::PNCMap pncMap;
-        visualization_msgs::msg::MarkerArray pncMapMarkerArray;
-        geometry_msgs::msg::Point pCenter;
-        geometry_msgs::msg::Point pLeft;
-        geometry_msgs::msg::Point pRight;
-        float64 lengthStep{ 0.0 };
-    };
-}  // namespace Planning
-#endif  // PNC_MAP_CREATOR_BASE_H_
+    // 获取地图的可视化数据（MarkerArray，给 RViz 用）
+    visualization_msgs::msg::MarkerArray getPNCMapMarkerArray() const { return pncMapMarkerArray; }
+
+  protected:
+    base_msgs::msg::PNCMap pncMap;
+    visualization_msgs::msg::MarkerArray pncMapMarkerArray;
+    geometry_msgs::msg::Point pCenter;
+    geometry_msgs::msg::Point pLeft;
+    geometry_msgs::msg::Point pRight;
+    float64 lengthStep{ 0.0 };
+  };
+} // namespace Planning
+#endif // PNC_MAP_CREATOR_BASE_H_

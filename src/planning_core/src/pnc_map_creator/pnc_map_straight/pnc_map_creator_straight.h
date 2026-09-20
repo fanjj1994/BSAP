@@ -6,12 +6,12 @@
 namespace Planning
 {
     // 直线地图创建器：沿 +x 方向的直道
-    class PncMapCreatorStraight  : public PNCMapCreatorBase
+    class PNCMapCreatorStraight  : public PNCMapCreatorBase
     {
     public:
-        PncMapCreatorStraight(); // 创建直道地图 
-        PncMapCreatorStraight(const PncMapCreatorStraight &) = delete;
-        ~PncMapCreatorStraight() = default;
+        PNCMapCreatorStraight(); // 创建直道地图 
+        PNCMapCreatorStraight(const PNCMapCreatorStraight &) = delete;
+        ~PNCMapCreatorStraight() = default;
 
         // 实现基类接口：生成并返回直线 PNC 地图
         base_msgs::msg::PNCMap createPNCMap() override;
