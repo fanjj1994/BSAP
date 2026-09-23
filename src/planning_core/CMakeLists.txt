@@ -17,7 +17,11 @@ include_directories(
   src/common/common_type
   src/pnc_map_creator
   src/pnc_map_creator/pnc_map_straight
+  src/global_planner/global_planner_normal
+  src/global_planner
 )
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # 编译 pnc_map_server
 add_executable(pnc_map_server
@@ -26,8 +30,16 @@ add_executable(pnc_map_server
 )
 ament_target_dependencies(pnc_map_server rclcpp base_msgs geometry_msgs visualization_msgs nav_msgs)
 
+# 编译 global_path_server
+add_executable(global_path_server
+  src/global_planner/global_path_server.cpp
+  src/global_planner/global_planner_normal/global_planner_normal.cpp
+)
+
+ament_target_dependencies(global_path_server rclcpp base_msgs geometry_msgs visualization_msgs nav_msgs)
+
 # 安装到 lib/planning_core
-install(TARGETS pnc_map_server
+install(TARGETS pnc_map_server global_path_server
   DESTINATION lib/${PROJECT_NAME}
 )
 
