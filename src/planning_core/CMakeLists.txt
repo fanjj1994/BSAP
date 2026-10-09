@@ -11,6 +11,9 @@ find_package(base_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(OsqpEigen REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 # 头文件搜索路径（common_type 和各地图创建器子目录）
 include_directories(
@@ -19,6 +22,8 @@ include_directories(
   src/pnc_map_creator/pnc_map_straight
   src/global_planner/global_planner_normal
   src/global_planner
+  src/common/math
+  src/reference_line
 )
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -43,4 +48,6 @@ install(TARGETS pnc_map_server global_path_server
   DESTINATION lib/${PROJECT_NAME}
 )
 
+# 安装配置文件到 share/planning_core/config
+install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
 ament_package()

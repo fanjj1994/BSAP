@@ -1,0 +1,19 @@
+# 规划配置
+
+pnc_map:
+  frame: "world"
+  type: 0
+  road_length: 200.0
+  road_half_width: 3.5
+  segment_len: 1.0
+
+global_path:
+  type: 0
+
+reference_line:
+  front_size: 80
+  back_size: 20
+
+planning_process:
+  cycle_time: 0.1
+  perception_range: 100.0
