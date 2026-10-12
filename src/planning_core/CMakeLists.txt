@@ -14,6 +14,7 @@ find_package(nav_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(OsqpEigen REQUIRED)
 find_package(yaml-cpp REQUIRED)
+find_package(ament_index_cpp REQUIRED)
 
 # 头文件搜索路径（common_type 和各地图创建器子目录）
 include_directories(
@@ -24,6 +25,8 @@ include_directories(
   src/global_planner
   src/common/math
   src/reference_line
+  src/common/config_reader
+  src/planning_process
 )
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -43,8 +46,21 @@ add_executable(global_path_server
 
 ament_target_dependencies(global_path_server rclcpp base_msgs geometry_msgs visualization_msgs nav_msgs)
 
+# 编译 planning_process
+add_executable(planning_process
+  src/planning_process/planning_process_main.cpp
+  src/planning_process/planning_process.cpp
+  src/common/math/curve.cpp
+  src/common/config_reader/config_reader.cpp
+  src/reference_line/reference_line_creator.cpp
+  src/reference_line/reference_line_smoother.cpp
+)
+
+ament_target_dependencies(planning_process rclcpp base_msgs geometry_msgs visualization_msgs nav_msgs ament_index_cpp)
+
+target_link_libraries(planning_process yaml-cpp::yaml-cpp OsqpEigen::OsqpEigen Eigen3::Eigen)
 # 安装到 lib/planning_core
-install(TARGETS pnc_map_server global_path_server
+install(TARGETS pnc_map_server global_path_server planning_process
   DESTINATION lib/${PROJECT_NAME}
 )
 
