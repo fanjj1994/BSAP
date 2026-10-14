@@ -14,7 +14,7 @@ namespace Planning
   class ReferenceLineCreator
   {
   public:
-    ReferenceLineCreator();
+    ReferenceLineCreator(uint32 frontSize, uint32 backSize,const std::string& frameId);
     ReferenceLineCreator(const ReferenceLineCreator &) = delete;
     ~ReferenceLineCreator() = default;
     base_msgs::msg::Referline createReferenceLine(const nav_msgs::msg::Path &globalPath,
@@ -25,16 +25,16 @@ namespace Planning
     inline int16 getMatchPointIndex() const { return matchPointIndex; }
     inline int16 getFrontIndex() const { return frontIndex; }
     inline int16 getBackIndex() const { return backIndex; }
-
   private:
     base_msgs::msg::Referline referenceLine;
+    std::string frameId;
     nav_msgs::msg::Path referlineRviz;
     int16 lastMatchPointIndex = -1;
     int16 matchPointIndex = -1;
     int16 frontIndex = -1;
     int16 backIndex = -1;
-    static constexpr int16 FRONT_SIZE = 80;
-    static constexpr int16 BACK_SIZE = 20;
+    uint32 frontSize;
+    uint32 backSize;
   };
 } // namespace Planning
 #endif // REFERENCE_LINE_CREATOR_H_

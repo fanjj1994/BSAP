@@ -15,6 +15,8 @@ find_package(Eigen3 REQUIRED)
 find_package(OsqpEigen REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(ament_index_cpp REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
 
 # 头文件搜索路径（common_type 和各地图创建器子目录）
 include_directories(
@@ -27,6 +29,8 @@ include_directories(
   src/reference_line
   src/common/config_reader
   src/planning_process
+  src/vehicle_info
+  src/vehicle_info/ego_car
 )
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -54,9 +58,10 @@ add_executable(planning_process
   src/common/config_reader/config_reader.cpp
   src/reference_line/reference_line_creator.cpp
   src/reference_line/reference_line_smoother.cpp
+  src/vehicle_info/ego_car/ego_car.cpp
 )
 
-ament_target_dependencies(planning_process rclcpp base_msgs geometry_msgs visualization_msgs nav_msgs ament_index_cpp)
+ament_target_dependencies(planning_process rclcpp base_msgs geometry_msgs visualization_msgs nav_msgs ament_index_cpp tf2 tf2_ros)
 
 target_link_libraries(planning_process yaml-cpp::yaml-cpp OsqpEigen::OsqpEigen Eigen3::Eigen)
 # 安装到 lib/planning_core

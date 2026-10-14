@@ -1,5 +1,16 @@
 # 规划配置
 
+vehicle:
+  ego_car:
+    id: 0
+    frame: "base_footprint"
+    length: 3.0
+    width: 1.5
+    pose_x: 0.0
+    pose_y: 0.0
+    pose_theta: 0.0
+    set_speed: 1.0
+
 pnc_map:
   frame: "world"
   type: 0

@@ -2,11 +2,13 @@
 
 namespace Planning
 {
-  ReferenceLineCreator::ReferenceLineCreator()
+  ReferenceLineCreator::ReferenceLineCreator(const uint32 frontSize, const uint32 backSize, const std::string &frameId)
+      : frameId(frameId),
+        frontSize(frontSize),
+        backSize(backSize)
   {
     RCLCPP_INFO(rclcpp::get_logger("referenceline"), "referenceline created");
   }
-
   base_msgs::msg::Referline
   ReferenceLineCreator::createReferenceLine(const nav_msgs::msg::Path &globalPath,
                                             const geometry_msgs::msg::PoseStamped &vehiclePose)
@@ -14,6 +16,7 @@ namespace Planning
     // 如果全局路径为空，返回空参考线
     if (globalPath.poses.empty())
     {
+      RCLCPP_ERROR(rclcpp::get_logger("referenceline"), "globalPath is empty!");
       return referenceLine;
     }
     // 查找匹配点
@@ -26,11 +29,13 @@ namespace Planning
     }
     // 计算最前点和最后点的下标
     const int16 globalPathSize = static_cast<int16>(globalPath.poses.size());
-    frontIndex =(matchPointIndex + FRONT_SIZE >= globalPathSize - 1) ? (globalPathSize - 1) : (matchPointIndex + FRONT_SIZE);
-    backIndex = (matchPointIndex - BACK_SIZE <= 0) ? 0 : (matchPointIndex - BACK_SIZE);
-
+    frontIndex = (matchPointIndex + static_cast<int16>(frontSize) >= globalPathSize - 1)
+                     ? (globalPathSize - 1)
+                     : (matchPointIndex + static_cast<int16>(frontSize));
+    backIndex =
+        (matchPointIndex - static_cast<int16>(backSize) <= 0) ? 0 : (matchPointIndex - static_cast<int16>(backSize));
     // 填充进参考线
-    referenceLine.header.frame_id = "world";
+    referenceLine.header.frame_id = frameId;
     referenceLine.header.stamp = rclcpp::Clock().now();
     referenceLine.refer_line.clear();
     base_msgs::msg::ReferlinePoint pointTmp;
