@@ -103,13 +103,15 @@ namespace Planning
   {
     getVehicleLocation(egoCar);
     const auto referenceLine_ = referenceLineCreator->createReferenceLine(globalPath, egoCar->getVehiclePose());
+    egoCar->vehicleCartesianToFrenet(referenceLine_);
+
     if (referenceLine_.refer_line.empty())
     {
       RCLCPP_ERROR(this->get_logger(), "reference line is empty!");
       return;
     }
+    RCLCPP_INFO(this->get_logger(), "ego frenet: s = %.2f, l = %.2f, ds_dt = %.2f",egoCar->getS(),egoCar->getL(),egoCar->getDsDt());
     referenceLineRvizPublisher->publish(referenceLineCreator->referenceLineToRviz());
-    RCLCPP_INFO(this->get_logger(), "refer_line size : %zu", referenceLine_.refer_line.size());
   }
 
   void PlanningProcess::spawnVehicle(const std::shared_ptr<VehicleInfoBase>& vehicle)

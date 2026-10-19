@@ -31,6 +31,7 @@ include_directories(
   src/planning_process
   src/vehicle_info
   src/vehicle_info/ego_car
+  src/move_cmd
 )
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -64,8 +65,18 @@ add_executable(planning_process
 ament_target_dependencies(planning_process rclcpp base_msgs geometry_msgs visualization_msgs nav_msgs ament_index_cpp tf2 tf2_ros)
 
 target_link_libraries(planning_process yaml-cpp::yaml-cpp OsqpEigen::OsqpEigen Eigen3::Eigen)
+
+add_executable(ego_car_move_cmd
+  src/move_cmd/ego_car_move_cmd.cpp
+  src/common/config_reader/config_reader.cpp
+  src/vehicle_info/ego_car/ego_car.cpp
+  src/common/math/curve.cpp
+)
+
+ament_target_dependencies(ego_car_move_cmd rclcpp base_msgs geometry_msgs visualization_msgs nav_msgs tf2 tf2_ros ament_index_cpp)
+target_link_libraries(ego_car_move_cmd yaml-cpp::yaml-cpp)
 # 安装到 lib/planning_core
-install(TARGETS pnc_map_server global_path_server planning_process
+install(TARGETS pnc_map_server global_path_server planning_process ego_car_move_cmd
   DESTINATION lib/${PROJECT_NAME}
 )
 

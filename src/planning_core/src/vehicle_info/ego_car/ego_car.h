@@ -14,6 +14,7 @@ namespace Planning
     EgoCar(const EgoCar &) = delete;
     EgoCar &operator= (const EgoCar &) = delete;
     ~EgoCar() = default;
+    void vehicleCartesianToFrenet(const base_msgs::msg::Referline &referline) override;
   };
 } //namespace Planning
 #endif // EGO_CAR_H_

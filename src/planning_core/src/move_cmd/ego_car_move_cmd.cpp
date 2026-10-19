@@ -1,0 +1,72 @@
+#include "ego_car_move_cmd.h"
+
+namespace Planning
+{
+  EgoCarMoveCmd::EgoCarMoveCmd() : Node("car_move_cmd_node")
+  {
+    RCLCPP_INFO(this->get_logger(), "EgoCarMoveCmd node has been created.");
+    configReaderCarMoveCmd = std::make_unique<ConfigReader>();
+    configReaderCarMoveCmd->readPNCMapConfig();
+    configReaderCarMoveCmd->readVehicleConfig();
+
+    egoCar = std::make_shared<EgoCar>(configReaderCarMoveCmd->getEgoCar(), configReaderCarMoveCmd->getPNCMap().frame_);
+    carParam.posX = egoCar->getVehiclePose().pose.position.x;
+    carParam.posY = egoCar->getVehiclePose().pose.position.y;
+    carParam.theta = egoCar->getVehicleTheta();
+    carParam.speed = egoCar->getVehicleVelocity();
+
+    tfBroadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
+    referenceLineSubscription = this->create_subscription<nav_msgs::msg::Path>(
+        "reference_line", 10, std::bind(&EgoCarMoveCmd::carBroadcastTf, this, std::placeholders::_1));
+  }
+
+  void EgoCarMoveCmd::carBroadcastTf(const nav_msgs::msg::Path::SharedPtr msg)
+  {
+    const uint8 msgSize = static_cast<uint8>(msg->poses.size());
+    if (msgSize < 3U)
+    {
+      RCLCPP_ERROR(this->get_logger(), "msg too short!");
+      return;
+    }
+
+    float64 minDis = std::numeric_limits<double>::max();
+    uint8 closestIndex = 0U;
+    for (uint8 i = 0; i < msgSize; i++)
+    {
+      float64 dis =
+          std::hypot(msg->poses[i].pose.position.x - carParam.posX, msg->poses[i].pose.position.y - carParam.posY);
+      if (dis < minDis)
+      {
+        minDis = dis;
+        closestIndex = i;
+      }
+    }
+
+    carParam.posX += carParam.speed * std::cos(carParam.theta);
+    carParam.posY += carParam.speed * std::sin(carParam.theta);
+
+    geometry_msgs::msg::TransformStamped transformStamped;
+    transformStamped.header.frame_id = configReaderCarMoveCmd->getPNCMap().frame_;
+    transformStamped.header.stamp = this->get_clock()->now();
+    transformStamped.child_frame_id = egoCar->getVehicleChildFrame();
+    transformStamped.transform.translation.x = carParam.posX;
+    transformStamped.transform.translation.y = carParam.posY;
+    tf2::Quaternion qtn;
+    qtn.setRPY(0.0, 0.0, carParam.theta);
+    transformStamped.transform.rotation.x = qtn.getX();
+    transformStamped.transform.rotation.y = qtn.getY();
+    transformStamped.transform.rotation.z = qtn.getZ();
+    transformStamped.transform.rotation.w = qtn.getW();
+
+    tfBroadcaster->sendTransform(transformStamped);
+  }
+} // namespace Planning
+
+int main(int argc, char *argv[])
+{
+  rclcpp::init(argc, argv);
+  auto node = std::make_shared<Planning::EgoCarMoveCmd>();
+  rclcpp::spin(node);
+  rclcpp::shutdown();
+  return 0;
+}
