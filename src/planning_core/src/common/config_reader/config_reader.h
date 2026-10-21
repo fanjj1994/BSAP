@@ -3,6 +3,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include <yaml-cpp/yaml.h>
+#include <unordered_map>
 #include "common_type.h"
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
@@ -27,6 +28,7 @@ namespace Planning
         float64 road_length_ = 0.0;
         float64 road_half_width_ = 0.0;
         float64 segment_len_ = 0.0;
+        float64 lane_width_ = 0.0;
     };
 
     struct ReferenceLineStruct
@@ -46,6 +48,12 @@ namespace Planning
         uint32 type_ = 0U;
     };
 
+    struct DecisionStruct
+    {
+        float32 lat_safe_margin_ = 0.0;
+        float32 long_safe_margin_ = 0.0;
+    };
+
     class ConfigReader
     {
     public:
@@ -57,20 +65,24 @@ namespace Planning
         void readReferenceLineConfig();
         void readProcessConfig();
         void readGlobalPathConfig();
-        void readVehicleConfig();
+        void readVehiclesConfig();
+        void readDecisionConfig();
 
         PNCMapStruct getPNCMap() const { return pncMap; }
         ReferenceLineStruct getReferenceLine() const { return referenceLine; }
         ProcessStruct getProcess() const { return process; }
         GlobalPathStruct getGlobalPath() const { return globalPath; }
-        EgoCarStruct getEgoCar() const { return egoCar; }
+        EgoCarStruct getEgoCar() const { return vehiclePairs.at(0U); }
+        DecisionStruct getDecision() const { return decision; }
+        const std::unordered_map<uint8,EgoCarStruct> &getVehiclePairs() const { return vehiclePairs; }
     private:
         YAML::Node config;
         PNCMapStruct pncMap;
         ReferenceLineStruct referenceLine;
         ProcessStruct process;
         GlobalPathStruct globalPath;
-        EgoCarStruct egoCar;
+        DecisionStruct decision;
+        std::unordered_map<uint8, EgoCarStruct> vehiclePairs;
     };
 }  // namespace Planning
 #endif  // CONFIG_READER_H_

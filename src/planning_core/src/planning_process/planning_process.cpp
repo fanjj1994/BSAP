@@ -19,13 +19,15 @@ namespace Planning
     RCLCPP_INFO(this->get_logger(), "ReferenceLine configuration has been read. front_size : %u, back_size: %u",
                 configReaderProcess->getReferenceLine().front_size_,
                 configReaderProcess->getReferenceLine().back_size_);
+    decisionCenter = std::make_shared<DecisionCenter>();
+    tpCars = { std::make_shared<TP>(1U), std::make_shared<TP>(2U), std::make_shared<TP>(3U) };
     // 调用规划流程配置
     configReaderProcess->readProcessConfig();
     RCLCPP_INFO(this->get_logger(), "Process configuration has been read. cycle_time: %f",
                 configReaderProcess->getProcess().cycle_time_);
 
     // 调用车辆信息
-    configReaderProcess->readVehicleConfig();
+    configReaderProcess->readVehiclesConfig();
     egoCar = std::make_shared<EgoCar>(configReaderProcess->getEgoCar(), configReaderProcess->getPNCMap().frame_);
     RCLCPP_INFO(this->get_logger(), "ego car pose: x = %.2f, y = %.2f", egoCar->getVehiclePose().pose.position.x,
                 egoCar->getVehiclePose().pose.position.y);
@@ -104,13 +106,20 @@ namespace Planning
     getVehicleLocation(egoCar);
     const auto referenceLine_ = referenceLineCreator->createReferenceLine(globalPath, egoCar->getVehiclePose());
     egoCar->vehicleCartesianToFrenet(referenceLine_);
+    for (auto& tpCar : tpCars)
+    {
+      tpCar->vehicleCartesianToFrenet(referenceLine_);
+    }
+    decisionCenter->makePathDecision(egoCar, tpCars);
 
     if (referenceLine_.refer_line.empty())
     {
       RCLCPP_ERROR(this->get_logger(), "reference line is empty!");
       return;
     }
-    RCLCPP_INFO(this->get_logger(), "ego frenet: s = %.2f, l = %.2f, ds_dt = %.2f",egoCar->getS(),egoCar->getL(),egoCar->getDsDt());
+    RCLCPP_INFO(this->get_logger(), "ego frenet: s = %.2f, l = %.2f, ds_dt = %.2f", egoCar->getS(), egoCar->getL(),
+                egoCar->getDsDt());
+    RCLCPP_INFO(this->get_logger(), "decision points: %zu", decisionCenter->getPathDecisionPoints().size());
     referenceLineRvizPublisher->publish(referenceLineCreator->referenceLineToRviz());
   }
 

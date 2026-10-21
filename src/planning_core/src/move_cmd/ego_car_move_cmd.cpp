@@ -7,7 +7,7 @@ namespace Planning
     RCLCPP_INFO(this->get_logger(), "EgoCarMoveCmd node has been created.");
     configReaderCarMoveCmd = std::make_unique<ConfigReader>();
     configReaderCarMoveCmd->readPNCMapConfig();
-    configReaderCarMoveCmd->readVehicleConfig();
+    configReaderCarMoveCmd->readVehiclesConfig();
 
     egoCar = std::make_shared<EgoCar>(configReaderCarMoveCmd->getEgoCar(), configReaderCarMoveCmd->getPNCMap().frame_);
     carParam.posX = egoCar->getVehiclePose().pose.position.x;
@@ -27,19 +27,6 @@ namespace Planning
     {
       RCLCPP_ERROR(this->get_logger(), "msg too short!");
       return;
-    }
-
-    float64 minDis = std::numeric_limits<double>::max();
-    uint8 closestIndex = 0U;
-    for (uint8 i = 0; i < msgSize; i++)
-    {
-      float64 dis =
-          std::hypot(msg->poses[i].pose.position.x - carParam.posX, msg->poses[i].pose.position.y - carParam.posY);
-      if (dis < minDis)
-      {
-        minDis = dis;
-        closestIndex = i;
-      }
     }
 
     carParam.posX += carParam.speed * std::cos(carParam.theta);

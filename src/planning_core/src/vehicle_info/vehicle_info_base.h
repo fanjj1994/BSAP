@@ -6,6 +6,7 @@
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "base_msgs/msg/referline.hpp"
+#include "config_reader.h"
 
 namespace Planning
 {
@@ -42,6 +43,7 @@ namespace Planning
     }
 
   protected:
+    std::unique_ptr<ConfigReader> vehicleInfoConfigReader;
     std::string vehicleChildFrame = "";
     uint8 vehicleID = 0U;
     float64 vehicleLength = 0.0;

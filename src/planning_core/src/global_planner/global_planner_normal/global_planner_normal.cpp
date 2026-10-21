@@ -26,7 +26,7 @@ namespace Planning
         for (uint32 i  =0U; i < midLineSize; i++)
         {
             p_tmp.pose.position.x = (pncMap.midline.points[i].x + pncMap.right_boundary.points[i].x)/ 2.0;
-            p_tmp.pose.position.y = (pncMap.midline.points[i].y + pncMap.right_boundary.points[i].y)/ 2.0;
+            p_tmp.pose.position.y = pncMap.midline.points[i].y - pncMap.lane_width / 2.0;
             globalPath.poses.emplace_back(p_tmp);   
         }
 

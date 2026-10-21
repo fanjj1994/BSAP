@@ -13,6 +13,8 @@
 #include "tf2_ros/static_transform_broadcaster.h"
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_listener.h"
+#include "tp_base.h"
+#include "decision_center.h"
 
 namespace Planning
 {
@@ -25,7 +27,8 @@ namespace Planning
     ~PlanningProcess() = default;
     bool process();
     bool initPlanning();
-    template <typename T> bool connectServer(const T& client, const std::string& serverName);
+    template <typename T>
+    bool connectServer(const T &client, const std::string &serverName);
     bool requestPNCMap();
     bool requestGlobalPath();
     void planningCallback();
@@ -45,6 +48,8 @@ namespace Planning
     std::shared_ptr<tf2_ros::StaticTransformBroadcaster> tfBroadcaster;
     std::unique_ptr<tf2_ros::Buffer> tfBuffer;
     std::shared_ptr<tf2_ros::TransformListener> tfListener;
+    std::shared_ptr<DecisionCenter> decisionCenter;
+    std::vector<std::shared_ptr<VehicleInfoBase>> tpCars;
   };
 } // namespace Planning
 #endif // PLANNING_PROCESS_H_

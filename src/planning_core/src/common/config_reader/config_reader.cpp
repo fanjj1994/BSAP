@@ -16,6 +16,7 @@ namespace Planning
       pncMap.road_length_ = config["pnc_map"]["road_length"].as<float64>();
       pncMap.road_half_width_ = config["pnc_map"]["road_half_width"].as<float64>();
       pncMap.segment_len_ = config["pnc_map"]["segment_len"].as<float64>();
+      pncMap.lane_width_  = config["pnc_map"]["lane_width"].as<float64>();
     }
     catch (const YAML::Exception& e)
     {
@@ -65,24 +66,45 @@ namespace Planning
     }
   }
 
-  void ConfigReader::readVehicleConfig()
+  void ConfigReader::readVehiclesConfig()
   {
     try
     {
-      egoCar.frame_ = config["vehicle"]["ego_car"]["frame"].as<std::string>();
-      egoCar.id_ = config["vehicle"]["ego_car"]["id"].as<uint8>();
-      egoCar.length_ = config["vehicle"]["ego_car"]["length"].as<float64>();
-      egoCar.width_ = config["vehicle"]["ego_car"]["width"].as<float64>();
-      egoCar.pose_x_ = config["vehicle"]["ego_car"]["pose_x"].as<float64>();
-      egoCar.pose_y_ = config["vehicle"]["ego_car"]["pose_y"].as<float64>();
-      egoCar.pose_theta_ = config["vehicle"]["ego_car"]["pose_theta"].as<float64>();
-      egoCar.set_speed_ = config["vehicle"]["ego_car"]["set_speed"].as<float64>();
+      for(auto it : config["vehicle"])
+      {
+        EgoCarStruct vehicleStruct;
+        vehicleStruct.frame_ = it.second["frame"].as<std::string>();
+        vehicleStruct.id_ = it.second["id"].as<uint8>();
+        vehicleStruct.length_ = it.second["length"].as<float64>();
+        vehicleStruct.width_ = it.second["width"].as<float64>();
+        vehicleStruct.pose_x_ = it.second["pose_x"].as<float64>();
+        vehicleStruct.pose_y_ = it.second["pose_y"].as<float64>();
+        vehicleStruct.pose_theta_ = it.second["pose_theta"].as<float64>();
+        vehicleStruct.set_speed_ = it.second["set_speed"].as<float64>();
+        vehiclePairs.emplace(vehicleStruct.id_,vehicleStruct);
+      }
     }
     catch (const YAML::Exception& e)
     {
-      RCLCPP_ERROR(rclcpp::get_logger("config"), "Failed to load vehicle config: %s", e.what());
+      RCLCPP_ERROR(rclcpp::get_logger("config"), "Failed to load vehicles config: %s", e.what());
       throw;
     }
+  }
+
+  void ConfigReader::readDecisionConfig()
+  {
+    try
+    {
+      readPNCMapConfig();
+      readReferenceLineConfig();
+      decision.lat_safe_margin_ = config["decision"]["lat_safe_margin"].as<float32>();
+      decision.long_safe_margin_ = config["decision"]["long_safe_margin"].as<float32>();
+    }
+    catch(const YAML::Exception& e)
+    {
+      RCLCPP_ERROR(rclcpp::get_logger("config"),"Failed to load decision config: %s", e.what());
+      throw;
+    }   
   }
 
 } // namespace Planning

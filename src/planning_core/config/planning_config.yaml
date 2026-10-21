@@ -10,6 +10,33 @@ vehicle:
     pose_y: 0.0
     pose_theta: 0.0
     set_speed: 1.0
+  tp_car1:
+    id: 1
+    frame: "base_footprint_tp1"
+    length: 3.0
+    width: 1.6
+    pose_x: 60.0
+    pose_y: 0.0
+    pose_theta: 0.0
+    set_speed: 0.0
+  tp_car2:
+    id: 2
+    frame: "base_footprint_tp2"
+    length: 3.0
+    width: 1.6
+    pose_x: 120.0
+    pose_y: 17.0
+    pose_theta: 1.0
+    set_speed: 0.0
+  tp_car3:
+    id: 3
+    frame: "base_footprint_tp3"
+    length: 3.0
+    width: 1.6
+    pose_x: 85.0
+    pose_y: 4.0
+    pose_theta: 0.0
+    set_speed: 0.0
 
 pnc_map:
   frame: "world"
@@ -17,6 +44,7 @@ pnc_map:
   road_length: 200.0
   road_half_width: 3.5
   segment_len: 1.0
+  lane_width: 3.5
 
 global_path:
   type: 0
@@ -28,3 +56,7 @@ reference_line:
 planning_process:
   cycle_time: 0.1
   perception_range: 100.0
+
+decision:
+  lat_safe_margin: 0.5
+  long_safe_margin: 10.0

@@ -32,6 +32,8 @@ include_directories(
   src/vehicle_info
   src/vehicle_info/ego_car
   src/move_cmd
+  src/vehicle_info/traffic_participants
+  src/decision_center
 )
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -40,8 +42,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_executable(pnc_map_server
   src/pnc_map_creator/pnc_map_server.cpp
   src/pnc_map_creator/pnc_map_straight/pnc_map_creator_straight.cpp
+  src/common/config_reader/config_reader.cpp
 )
-ament_target_dependencies(pnc_map_server rclcpp base_msgs geometry_msgs visualization_msgs nav_msgs)
+ament_target_dependencies(pnc_map_server rclcpp base_msgs geometry_msgs visualization_msgs nav_msgs ament_index_cpp)
+target_link_libraries(pnc_map_server yaml-cpp::yaml-cpp)
 
 # 编译 global_path_server
 add_executable(global_path_server
@@ -60,6 +64,8 @@ add_executable(planning_process
   src/reference_line/reference_line_creator.cpp
   src/reference_line/reference_line_smoother.cpp
   src/vehicle_info/ego_car/ego_car.cpp
+  src/decision_center/decision_center.cpp
+  src/vehicle_info/traffic_participants/tp_base.cpp
 )
 
 ament_target_dependencies(planning_process rclcpp base_msgs geometry_msgs visualization_msgs nav_msgs ament_index_cpp tf2 tf2_ros)
@@ -75,8 +81,18 @@ add_executable(ego_car_move_cmd
 
 ament_target_dependencies(ego_car_move_cmd rclcpp base_msgs geometry_msgs visualization_msgs nav_msgs tf2 tf2_ros ament_index_cpp)
 target_link_libraries(ego_car_move_cmd yaml-cpp::yaml-cpp)
+
+add_executable(tp_move_cmd
+  src/move_cmd/tp_move_cmd.cpp
+  src/common/config_reader/config_reader.cpp
+  src/common/math/curve.cpp
+  src/vehicle_info/traffic_participants/tp_base.cpp
+)
+
+ament_target_dependencies(tp_move_cmd rclcpp base_msgs geometry_msgs visualization_msgs nav_msgs ament_index_cpp tf2 tf2_ros)
+target_link_libraries(tp_move_cmd yaml-cpp::yaml-cpp)
 # 安装到 lib/planning_core
-install(TARGETS pnc_map_server global_path_server planning_process ego_car_move_cmd
+install(TARGETS pnc_map_server global_path_server planning_process ego_car_move_cmd tp_move_cmd
   DESTINATION lib/${PROJECT_NAME}
 )
 

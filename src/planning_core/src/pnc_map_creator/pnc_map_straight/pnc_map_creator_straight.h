@@ -2,6 +2,7 @@
 #define PNC_MAP_CREATOR_STRAIGHT_H_
 
 #include "pnc_map_creator_base.h"
+#include "config_reader.h"
 
 namespace Planning
 {
@@ -19,6 +20,8 @@ namespace Planning
     private:
         // 初始化地图元数据与三条线的 Marker 样式
         void initPNCMap();
+
+        std::unique_ptr<ConfigReader> pncMapConfig;
 
         // 沿 x 方向采样生成三条线的几何点
         // length： 要画的长度[m]
