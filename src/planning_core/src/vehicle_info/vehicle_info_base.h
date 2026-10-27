@@ -10,6 +10,7 @@
 
 namespace Planning
 {
+  // 车辆信息基类
   class VehicleInfoBase
   {
   public:

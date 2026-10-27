@@ -7,7 +7,8 @@
 #include "global_planner_normal.h"
 
 namespace Planning
-{   
+{
+    // 全局路径服务器节点：对外提供"取全局路径"服务
     class GlobalPathServer : public rclcpp::Node
     {
     public:

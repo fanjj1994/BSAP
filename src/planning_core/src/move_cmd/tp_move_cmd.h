@@ -9,15 +9,18 @@
 
 namespace Planning
 {
+  // TP 车辆参数
   struct TpParam
   {
-    float64 posX = 0.0;
-    float64 posY = 0.0;
+    float64 posX = 0.0;     // unit: m
+    float64 posY = 0.0;     // unit: m
     float64 theta = 0.0;
-    float64 speed = 0.0;
+    float64 speed = 0.0;    // unit: m/s
     std::shared_ptr<TP> tpCar;
-    std::shared_ptr<tf2_ros::TransformBroadcaster> tfBroadcaster;
+    std::shared_ptr<tf2_ros::TransformBroadcaster> tfBroadcaster;  // tf broadcaster
   };
+
+  // TP 运动控制节点：按配置速度积分推进各 TP 并广播 TF
   class TPMoveCmd : public rclcpp::Node
   {
   public:
@@ -27,9 +30,11 @@ namespace Planning
     ~TPMoveCmd() = default;
 
   private:
-    std::unique_ptr<ConfigReader> configReaderTp;
-    std::vector<TpParam> tpCarParams;
-    rclcpp::TimerBase::SharedPtr timerTpMoveCmd;
+    std::unique_ptr<ConfigReader> configReaderTp;       // config reader
+    std::vector<TpParam> tpCarParams;                   // tp list
+    rclcpp::TimerBase::SharedPtr timerTpMoveCmd;        // broadcast timer
+
+    // 按速度积分推进各 TP 并广播 TF
     void tpBroadcastTf();
   };
 } // namespace Planning

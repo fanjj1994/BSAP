@@ -10,14 +10,16 @@
 
 namespace Planning
 {
+  // 自车运动状态
   struct CarParam
   {
-    float64 posX = 0.0;
-    float64 posY = 0.0;
+    float64 posX = 0.0;   // unit: m
+    float64 posY = 0.0;   // unit: m
     float64 theta = 0.0;
-    float64 speed = 0.0;
+    float64 speed = 0.0;  // unit: m/s
   };
 
+  // 自车运动控制节点：订阅参考线，按周期积分推进自车并广播 TF
   class EgoCarMoveCmd : public rclcpp::Node
   {
   public:
@@ -25,12 +27,16 @@ namespace Planning
     EgoCarMoveCmd(const EgoCarMoveCmd&) = delete;
     EgoCarMoveCmd &operator=(const EgoCarMoveCmd &) = delete;
     ~EgoCarMoveCmd() = default;
+
   private:
-    std::shared_ptr<tf2_ros::TransformBroadcaster> tfBroadcaster;
-    rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr referenceLineSubscription;
-    std::unique_ptr<ConfigReader> configReaderCarMoveCmd;
-    std::shared_ptr<VehicleInfoBase> egoCar;
-    CarParam carParam;
+    std::shared_ptr<tf2_ros::TransformBroadcaster> tfBroadcaster;              // tf broadcaster
+    rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr referenceLineSubscription;  // reference line subscription
+    std::unique_ptr<ConfigReader> configReaderCarMoveCmd;                       // config reader
+    std::shared_ptr<VehicleInfoBase> egoCar;                                    // ego car
+    CarParam carParam;                                                          // ego car motion state
+    float64 cycleTime = 0.1;  // unit: s，积分步长
+
+    // 按速度积分推进自车并广播 TF
     void carBroadcastTf(const nav_msgs::msg::Path::SharedPtr msg);
   };
 } // namespace Planning

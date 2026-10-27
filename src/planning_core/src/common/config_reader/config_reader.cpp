@@ -97,6 +97,7 @@ namespace Planning
     {
       readPNCMapConfig();
       readReferenceLineConfig();
+      readLocalPathConfig();
       decision.lat_safe_margin_ = config["decision"]["lat_safe_margin"].as<float32>();
       decision.long_safe_margin_ = config["decision"]["long_safe_margin"].as<float32>();
     }
@@ -105,6 +106,28 @@ namespace Planning
       RCLCPP_ERROR(rclcpp::get_logger("config"),"Failed to load decision config: %s", e.what());
       throw;
     }   
+  }
+
+  // local path（依赖 pnc_map/global_path/reference_line 三套餐；键名与 yaml 段名 local_path 对齐）
+  void ConfigReader::readLocalPathConfig()
+  {
+    try
+    {
+      readPNCMapConfig();
+      readGlobalPathConfig();
+      readReferenceLineConfig();
+      readVehiclesConfig();
+      localPath.path_size_ = config["local_path"]["path_size"].as<uint32>();
+      localPath.interval_ = config["local_path"]["interval"].as<float64>();
+      localPath.weight_smooth_ = config["local_path"]["weight_smooth"].as<float64>();
+      localPath.weight_slope_ = config["local_path"]["weight_slope"].as<float64>();
+      localPath.weight_offset_ = config["local_path"]["weight_offset"].as<float64>();
+    }
+    catch(const YAML::Exception& e)
+    {
+      RCLCPP_ERROR(rclcpp::get_logger("config"), "Failed to load local_path config: %s", e.what());
+      throw;
+    }
   }
 
 } // namespace Planning

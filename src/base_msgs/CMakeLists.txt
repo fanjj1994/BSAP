@@ -12,6 +12,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/PNCMap.msg"
   "msg/Referline.msg"
   "msg/ReferlinePoint.msg"
+  "msg/LocalPath.msg"
+  "msg/LocalPathPoint.msg"
   "srv/PNCMapService.srv"
   "srv/GlobalPathService.srv"
   DEPENDENCIES std_msgs geometry_msgs visualization_msgs nav_msgs

@@ -6,7 +6,7 @@
 
 namespace Planning
 {
-
+  // 自车
   class EgoCar : public VehicleInfoBase
   {
   public:
@@ -14,6 +14,8 @@ namespace Planning
     EgoCar(const EgoCar &) = delete;
     EgoCar &operator= (const EgoCar &) = delete;
     ~EgoCar() = default;
+
+    // cartesian to frenet
     void vehicleCartesianToFrenet(const base_msgs::msg::Referline &referline) override;
   };
 } //namespace Planning

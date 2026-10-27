@@ -6,27 +6,28 @@ namespace Planning
   {
     configReaderProcess = std::make_unique<ConfigReader>();
     RCLCPP_INFO(this->get_logger(), "PlanningProcess node has been created.");
-    // 调用地图配置
+    // 读地图配置
     configReaderProcess->readPNCMapConfig();
     RCLCPP_INFO(this->get_logger(), "PNCMap configuration has been read.frame: %s, road_length: %f",
                 configReaderProcess->getPNCMap().frame_.c_str(), configReaderProcess->getPNCMap().road_length_);
-    // 调用全局路径配置
+    // 读全局路径配置
     configReaderProcess->readGlobalPathConfig();
     RCLCPP_INFO(this->get_logger(), "GlobalPath configuration has been read. global_path_type: %u",
                 configReaderProcess->getGlobalPath().type_);
-    // 调用参考线配置
+    // 读参考线配置
     configReaderProcess->readReferenceLineConfig();
     RCLCPP_INFO(this->get_logger(), "ReferenceLine configuration has been read. front_size : %u, back_size: %u",
                 configReaderProcess->getReferenceLine().front_size_,
                 configReaderProcess->getReferenceLine().back_size_);
     decisionCenter = std::make_shared<DecisionCenter>();
+    // 初始化三辆 TP
     tpCars = { std::make_shared<TP>(1U), std::make_shared<TP>(2U), std::make_shared<TP>(3U) };
-    // 调用规划流程配置
+    // 读规划周期
     configReaderProcess->readProcessConfig();
     RCLCPP_INFO(this->get_logger(), "Process configuration has been read. cycle_time: %f",
                 configReaderProcess->getProcess().cycle_time_);
 
-    // 调用车辆信息
+    // 读车辆配置并生成自车
     configReaderProcess->readVehiclesConfig();
     egoCar = std::make_shared<EgoCar>(configReaderProcess->getEgoCar(), configReaderProcess->getPNCMap().frame_);
     RCLCPP_INFO(this->get_logger(), "ego car pose: x = %.2f, y = %.2f", egoCar->getVehiclePose().pose.position.x,
@@ -36,6 +37,8 @@ namespace Planning
     referenceLineCreator = std::make_shared<ReferenceLineCreator>(configReaderProcess->getReferenceLine().front_size_,
                                                                   configReaderProcess->getReferenceLine().back_size_,
                                                                   configReaderProcess->getPNCMap().frame_);
+    localPathCreator = std::make_shared<LocalPathCreator>();
+    localPathPublisher = this->create_publisher<base_msgs::msg::LocalPath>("local_trajectory", 10);
     referenceLineRvizPublisher = this->create_publisher<nav_msgs::msg::Path>("reference_line", 10);
     tfBroadcaster = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
     tfBuffer = std::make_unique<tf2_ros::Buffer>(this->get_clock());
@@ -56,6 +59,7 @@ namespace Planning
     return true;
   }
 
+  // 入口：初始化并启动周期定时器
   bool PlanningProcess::process()
   {
     rclcpp::Rate rate(1.0);
@@ -76,6 +80,7 @@ namespace Planning
     return true;
   }
 
+  // 初始化：连服务、拉地图与全局路径、生成自车
   bool PlanningProcess::initPlanning()
   {
     if (!connectServer(pncMapClient, "pnc_map"))
@@ -101,15 +106,24 @@ namespace Planning
     spawnVehicle(egoCar);
     return true;
   }
+  // 周期回调：查车、投影、决策、发布
   void PlanningProcess::planningCallback()
   {
+    // 更新自车位姿
     getVehicleLocation(egoCar);
+    // 生成滑窗参考线
     const auto referenceLine_ = referenceLineCreator->createReferenceLine(globalPath, egoCar->getVehiclePose());
+    // 生成局部路径并发布
+    const auto localPath = localPathCreator->createLocalPath(referenceLine_, decisionCenter->getPathDecisionPoints());
+    localPathPublisher->publish(localPath);
+    // 自车投影到 Frenet
     egoCar->vehicleCartesianToFrenet(referenceLine_);
+    // 各 TP 投影到 Frenet
     for (auto& tpCar : tpCars)
     {
       tpCar->vehicleCartesianToFrenet(referenceLine_);
     }
+    // 路径决策
     decisionCenter->makePathDecision(egoCar, tpCars);
 
     if (referenceLine_.refer_line.empty())
@@ -123,6 +137,7 @@ namespace Planning
     referenceLineRvizPublisher->publish(referenceLineCreator->referenceLineToRviz());
   }
 
+  // 静态 TF 生成车辆出生点
   void PlanningProcess::spawnVehicle(const std::shared_ptr<VehicleInfoBase>& vehicle)
   {
     geometry_msgs::msg::TransformStamped spawn;
@@ -141,6 +156,7 @@ namespace Planning
     tfBroadcaster->sendTransform(spawn);
   }
 
+  // TF 查询更新车辆位姿
   void PlanningProcess::getVehicleLocation(const std::shared_ptr<VehicleInfoBase>& vehicle)
   {
     try
@@ -164,6 +180,7 @@ namespace Planning
     }
   }
 
+  // 请求 PNCMap 服务
   bool PlanningProcess::requestPNCMap()
   {
     RCLCPP_INFO(this->get_logger(), "Sending map request");
@@ -190,6 +207,7 @@ namespace Planning
     }
   }
 
+  // 请求 GlobalPath 服务
   bool PlanningProcess::requestGlobalPath()
   {
     RCLCPP_INFO(this->get_logger(), "Sending globalPath request");

@@ -10,6 +10,7 @@
 
 namespace Planning
 {
+  // 参考线平滑器
   class ReferenceLineSmoother
   {
   public:
@@ -18,6 +19,7 @@ namespace Planning
     ReferenceLineSmoother &operator=(const ReferenceLineSmoother &) = delete; // 赋值也删（原版有）
     ~ReferenceLineSmoother() = default;
 
+    // smooth the reference line in place
     void SmoothReferenceLine(base_msgs::msg::Referline &referline);
 
   private:

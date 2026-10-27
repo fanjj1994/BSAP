@@ -5,10 +5,14 @@ namespace Planning
   EgoCarMoveCmd::EgoCarMoveCmd() : Node("car_move_cmd_node")
   {
     RCLCPP_INFO(this->get_logger(), "EgoCarMoveCmd node has been created.");
+    // 读配置：地图、车辆与周期
     configReaderCarMoveCmd = std::make_unique<ConfigReader>();
     configReaderCarMoveCmd->readPNCMapConfig();
     configReaderCarMoveCmd->readVehiclesConfig();
+    configReaderCarMoveCmd->readProcessConfig();
+    cycleTime = configReaderCarMoveCmd->getProcess().cycle_time_;
 
+    // 初始化自车状态
     egoCar = std::make_shared<EgoCar>(configReaderCarMoveCmd->getEgoCar(), configReaderCarMoveCmd->getPNCMap().frame_);
     carParam.posX = egoCar->getVehiclePose().pose.position.x;
     carParam.posY = egoCar->getVehiclePose().pose.position.y;
@@ -16,10 +20,12 @@ namespace Planning
     carParam.speed = egoCar->getVehicleVelocity();
 
     tfBroadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
+    // 订阅参考线：每收到一条消息推进一步
     referenceLineSubscription = this->create_subscription<nav_msgs::msg::Path>(
         "reference_line", 10, std::bind(&EgoCarMoveCmd::carBroadcastTf, this, std::placeholders::_1));
   }
 
+  // 按周期积分推进自车并广播 TF
   void EgoCarMoveCmd::carBroadcastTf(const nav_msgs::msg::Path::SharedPtr msg)
   {
     const uint8 msgSize = static_cast<uint8>(msg->poses.size());
@@ -29,9 +35,11 @@ namespace Planning
       return;
     }
 
-    carParam.posX += carParam.speed * std::cos(carParam.theta);
-    carParam.posY += carParam.speed * std::sin(carParam.theta);
+    // 位置积分：速度 x 周期
+    carParam.posX += carParam.speed * cycleTime * std::cos(carParam.theta);
+    carParam.posY += carParam.speed * cycleTime * std::sin(carParam.theta);
 
+    // 组装并广播 TF
     geometry_msgs::msg::TransformStamped transformStamped;
     transformStamped.header.frame_id = configReaderCarMoveCmd->getPNCMap().frame_;
     transformStamped.header.stamp = this->get_clock()->now();

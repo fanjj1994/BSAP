@@ -1,0 +1,16 @@
+geometry_msgs/PoseStamped pose
+float64 s
+float64 l
+float64 ds_dt
+float64 dl_ds
+float64 dl_dt
+float64 dds_dt
+float64 ddl_ds
+float64 ddl_dt
+float64 theta
+float64 kappa
+float64 dkappa
+float64 rs
+float64 rtheta
+float64 rdkappa
+float64 rkappa

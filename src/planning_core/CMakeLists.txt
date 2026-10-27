@@ -34,6 +34,7 @@ include_directories(
   src/move_cmd
   src/vehicle_info/traffic_participants
   src/decision_center
+  src/local_path
 )
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -66,6 +67,8 @@ add_executable(planning_process
   src/vehicle_info/ego_car/ego_car.cpp
   src/decision_center/decision_center.cpp
   src/vehicle_info/traffic_participants/tp_base.cpp
+  src/local_path/local_path_creator.cpp
+  src/local_path/qp_local_path_solver.cpp
 )
 
 ament_target_dependencies(planning_process rclcpp base_msgs geometry_msgs visualization_msgs nav_msgs ament_index_cpp tf2 tf2_ros)
